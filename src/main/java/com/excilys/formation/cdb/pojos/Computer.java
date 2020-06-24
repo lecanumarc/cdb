@@ -2,6 +2,8 @@ package com.excilys.formation.cdb.pojos;
 
 import java.time.LocalDate;
 
+import com.excilys.formation.cdb.validator.ComputerValidator;
+
 public class Computer {
 	private int id;
 	private String name; // mandatory
@@ -79,6 +81,10 @@ public class Computer {
 	public String toString() {
 		return "Computer [id=" + id + ", name=" + name + ", introDate=" + introDate + ", discDate=" + discDate
 				+ ", companyId=" + companyId + "]";
+	}
+	
+	public void validate() {
+		ComputerValidator.validate(this);
 	}
 
 

@@ -48,15 +48,11 @@ public class TestComputerDAO {
 		assertEquals("computer company id is incorrect", 1, computer.getCompanyId());
 	}
 
-	@Test
-	public void testCreate() throws Exception {
-		Computer computer = new Computer();
-		computer.setCompanyId(1);
-		computer.setDiscDate(LocalDate.parse("1984-04-01"));
-		computer.setIntroDate(LocalDate.parse("1983-12-01"));
-		computer.setName("Computer name");
-		computerDAO.create(computer);
-	}
+//	@Test
+//	public void testCreate() throws Exception {
+//		Computer computer = new Computer(1, "TestName", null, null, 1);
+//		assertTrue("Computer was not created", computerDAO.create(computer));
+//	}
 
 	@Test
 	public void testDelete() throws Exception {
@@ -64,25 +60,28 @@ public class TestComputerDAO {
 		assertTrue("computer was not deleted", deletion);
 	}
 
+//	@Test
+//	public void testUpdate() throws Exception {	
+//		Computer computer = new Computer(17, "TestName", null, null, 1);
+//		assertTrue("Computer was not created", computerDAO.update(computer));
+//	}
+
 	@Test
 	public void testCountRows() throws Exception {
 		assertEquals(574, computerDAO.getNumberRows());
 	}
-	
+
 	@Test
 	public void testList() throws Exception {
 		ArrayList<Computer> list = computerDAO.list();
 		assertEquals(574, list.size());
 	}
-	
+
 
 	@Test
 	public void testListByPage() throws Exception {
 		ArrayList<Computer> list = computerDAO.listByPage(0, 10);
 		assertEquals(10, list.size());
 	}
-
-
-	
 
 }

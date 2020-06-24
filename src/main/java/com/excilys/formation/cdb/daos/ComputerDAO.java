@@ -14,7 +14,7 @@ import com.excilys.formation.cdb.services.Connector;
 
 public class ComputerDAO  {
 
-	private static final String CREATE_QRY = "insert into computer id, name, introduced, discontinued, company_id value (?,?,?,?,?)";
+	private static final String CREATE_QRY = "insert into computer (id, name, introduced, discontinued, company_id) value (?,?,?,?,?)";
 	private static final String DELETE_QRY = "delete from computer where id = (?)";
 	private static final String UPDATE_QRY = "update computer set name = ?, introduced = ?, discontinued = ? where id = ?";
 	private static final String FIND_BY_ID_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer WHERE id = ?"; 
@@ -36,17 +36,9 @@ public class ComputerDAO  {
 	public boolean create(Computer obj) {
 		try (Connection connect = connector.getInstance();
 				PreparedStatement st = connect.prepareStatement(CREATE_QRY)){
+			obj.validate();
 			st.setNull(1, java.sql.Types.INTEGER);
-			if(obj.getName().isEmpty()) {
-				throw new SQLException("Cannot insert computer with empty name !");
-			} else {
-				st.setString(2, obj.getName());
-			}
-			if(obj.getIntroDate() != null && obj.getDiscDate() != null) {
-				if(obj.getIntroDate().compareTo(obj.getDiscDate()) > 0) {
-					throw new Exception("Introduction date must be greater than discountinuation date.");
-				}
-			}
+			st.setString(2, obj.getName());
 			if(obj.getIntroDate() == null) {
 				st.setNull(3, java.sql.Types.DATE);
 			} else {
@@ -84,7 +76,6 @@ public class ComputerDAO  {
 	}
 
 	public boolean update(Computer obj) {
-
 		Computer computer = this.findById(obj.getId());
 		try (Connection connect = connector.getInstance(); 
 				PreparedStatement st = connect.prepareStatement(UPDATE_QRY)){

@@ -1,4 +1,5 @@
 package com.excilys.formation.cdb.services;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,6 +7,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import org.h2.store.RangeReader;
+import org.h2.tools.Script;
+import org.h2.util.ScriptReader;
 
 public class ConnectionH2 implements Connector{ 
 
@@ -15,10 +20,8 @@ public class ConnectionH2 implements Connector{
 	private static final String URL_KEY =  "urlH2";
 	private static final String USER_KEY  =  "user";
 	private static final String PASSWORD_KEY  =  "password";
-	//private static final String DRIVER  =  "driverH2";
 
 	public ConnectionH2(){
-
 		properties = new Properties();
 		try (InputStream input = new FileInputStream(FILE_PATH)) {
 			properties.load(input);
@@ -52,5 +55,4 @@ public class ConnectionH2 implements Connector{
 		}
 	}
 	
-
 }

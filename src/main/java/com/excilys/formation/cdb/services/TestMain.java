@@ -1,4 +1,7 @@
 package com.excilys.formation.cdb.services;
+
+import java.time.LocalDate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +21,23 @@ public class TestMain {
         logger.debug("Temperature set to {}. Old temperature was {}.", newT, oldT);
 
         ComputerDAO dao = new ComputerDAO(true);
-        Computer cpt = dao.findByName("Apple III Plus");
-        System.out.println(cpt);
+//		Computer computer = new Computer();
+//		computer.setCompanyId(1);
+//		computer.setDiscDate(LocalDate.parse("1984-04-01"));
+//		computer.setIntroDate(LocalDate.parse("1983-12-01"));
+//		computer.setName("Computer name");
+//		dao.create(computer);
+		
+		
+		Computer cpt ;
+		try {
+			cpt = new Computer(2000, "Computer name", null, null, 1);
+			boolean var = dao.create(cpt);
+			System.out.println(var);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
