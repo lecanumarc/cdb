@@ -3,7 +3,6 @@ package com.excilys.formation.cdb.pojos;
 import java.time.LocalDate;
 
 public class Computer {
-	//TODO : use builder patern https://stackoverflow.com/questions/222214/managing-constructors-with-many-parameters-in-java/222295#222295
 	private int id;
 	private String name; // mandatory
 	private LocalDate introDate; 
@@ -12,15 +11,20 @@ public class Computer {
 
 	public Computer(int id, String name, LocalDate introDate, LocalDate discDate, int companyId) throws Exception {
 		super();
-		if(name == "") throw new Exception("Name cannot be empty");
-		if(introDate != null && discDate != null && introDate.compareTo(discDate) > 0)
-			throw new Exception("Introduction date must not be greater than discontinuation date.");
+		if(name.isEmpty()) {
+			throw new IllegalArgumentException("Name cannot be empty");
+		}
+		if(introDate != null && discDate != null && introDate.compareTo(discDate) > 0) {
+			throw new IllegalArgumentException("Introduction date must not be greater than discontinuation date.");
+		}
 		this.id = id;
 		this.name = name;
-		if(introDate != null) 
+		if(introDate != null) {
 			this.introDate = introDate;
-		if(discDate != null) 
+		}
+		if(discDate != null) {
 			this.discDate = discDate;
+		}
 		this.companyId = companyId;
 	}
 
@@ -32,23 +36,28 @@ public class Computer {
 		return name;
 	}
 	public void setName(String name) throws Exception {
-		if(name == "") throw new Exception("Name cannot be empty");
+		if(name.isEmpty()) {
+			throw new IllegalArgumentException("Name cannot be empty");
+		}
 		this.name = name;
 	}
 	public LocalDate getIntroDate() {
 		return introDate;
 	}
 	public void setIntroDate(LocalDate introDate) throws Exception {
-		if(introDate != null && this.discDate != null && introDate.compareTo(this.discDate) > 0)
-			throw new Exception("Introduction date must not be greater than discontinuation date.");
+		if(introDate != null && this.discDate != null && introDate.compareTo(this.discDate) > 0) {
+			throw new IllegalArgumentException("Introduction date must not be greater than discontinuation date.");
+		}
 		this.introDate = introDate;
 	}
 	public LocalDate getDiscDate() {
 		return discDate;
 	}
 	public void setDiscDate(LocalDate discDate) throws Exception {	
-		if(this.introDate != null && discDate != null && this.introDate.compareTo(discDate) > 0)
-			throw new Exception("Introduction date must be greater than discontinuation date.");
+		if(this.introDate != null && discDate != null && this.introDate.compareTo(discDate) > 0) {
+			throw new IllegalArgumentException("Introduction date must be greater than discontinuation date.");
+
+		}
 		this.discDate = discDate;
 	}
 	public int getCompanyId() {

@@ -1,10 +1,12 @@
 package com.excilys.formation.cdb.tools;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 public class Page {
 
 	/*
 	 Page class, containing your entities and the page information.
 	 */
+	final Logger logger = LoggerFactory.getLogger(Page.class);
 	private String title;
 	private int number;
 	private String content; // content by lines
@@ -48,9 +50,10 @@ public class Page {
 	}
 	
 	public void presentPage() {
-		System.out.println("\n ------ " + this.getTitle() +" ------");
-		System.out.println(this.content);
-		System.out.println("------ "+this.number + " ------ ");
+		logger.info("\n ------ " + this.getTitle() +" ------");
+		logger.info(this.content);
+		logger.info("------ "+this.number + " ------ ");
+		logger.info(this.content);
 	}
 
 	@Override

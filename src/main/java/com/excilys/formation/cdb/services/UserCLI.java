@@ -14,10 +14,10 @@ public class UserCLI {
 	private static UserCLI instance;
 	private static ComputerDAO computerDAO;
 	private static CompanyDAO companyDAO;
-	
+
 	private UserCLI() {
-		computerDAO = (ComputerDAO) DAOFactory.getComputerDAO();
-		companyDAO = (CompanyDAO) DAOFactory.getCompanyDAO();
+		computerDAO = DAOFactory.getComputerDAO();
+		companyDAO = DAOFactory.getCompanyDAO();
 	}
 
 	public static UserCLI getInstance() {
@@ -32,50 +32,50 @@ public class UserCLI {
 		StringBuilder str = new StringBuilder(); 
 
 		for(Object obj : list) {
-			 str.append(obj.toString() +"\n");
+			str.append(obj.toString() +"\n");
 		}
 		return str.toString();
 	}
-	
+
 	public String listCompanies() {
 		ArrayList<Company> list = companyDAO.list();
 		StringBuilder str = new StringBuilder(); 
 
 		for(Object obj : list) {
-			 str.append(obj.toString() +"\n");
+			str.append(obj.toString() +"\n");
 		}
 		return str.toString();
 	}
-	
+
 	public String listComputersByPage(int offset, int rows) {
 		ArrayList<Computer> list = computerDAO.listByPage(offset, rows);
 		StringBuilder str = new StringBuilder(); 
 
 		for(Object obj : list) {
-			 str.append(obj.toString() +"\n");
+			str.append(obj.toString() +"\n");
 		}
 		return str.toString();
 	}
-	
+
 	public String listCompanyByPage(int offset, int rows) {
 		ArrayList<Company> list = companyDAO.listByPage(offset, rows);
 		StringBuilder str = new StringBuilder(); 
 
 		for(Object obj : list) {
-			 str.append(obj.toString() +"\n");
+			str.append(obj.toString() +"\n");
 		}
 		return str.toString();
 	}
-	
+
 	public String showComputerDetails(int id) {
-		Computer computer = computerDAO.find(id);
+		Computer computer = computerDAO.findById(id);
 		return computer.toString();
 	}
-	
+
 	public void createComputer(Computer computer) {
 		computerDAO.create(computer);
 	}
-	
+
 	public void updateComputer(Computer computer) {
 		computerDAO.update(computer);
 	}
@@ -83,21 +83,17 @@ public class UserCLI {
 	public void deleteComputer(int id) {
 		computerDAO.delete(id);
 	}
-	
+
 	public int getComputerRows() {
 		return computerDAO.getNumberRows();
 	}
-	
+
 	public int getCompanyRows() {
 		return companyDAO.getNumberRows();
 	}
-	
+
 	public void disconnect() {
-		try {
-			computerDAO.closeConnection();
-			companyDAO.closeConnection();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		computerDAO.closeConnection();
+		companyDAO.closeConnection();
 	}
 }

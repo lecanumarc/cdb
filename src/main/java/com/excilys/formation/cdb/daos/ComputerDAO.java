@@ -1,32 +1,43 @@
 package com.excilys.formation.cdb.daos;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.pojos.Computer;
+import com.excilys.formation.cdb.services.ConnectionH2;
+import com.excilys.formation.cdb.services.ConnectionMySQL;
+import com.excilys.formation.cdb.services.Connector;
 
-public class ComputerDAO extends DAO<Computer> {
+public class ComputerDAO  {
 
 	private static final String CREATE_QRY = "insert into computer id, name, introduced, discontinued, company_id value (?,?,?,?,?)";
 	private static final String DELETE_QRY = "delete from computer where id = (?)";
 	private static final String UPDATE_QRY = "update computer set name = ?, introduced = ?, discontinued = ? where id = ?";
-	private static final String FIND_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer WHERE id = ?"; 
+	private static final String FIND_BY_ID_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer WHERE id = ?"; 
+	private static final String FIND_BY_NAME_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer WHERE name = ?"; 
 	private static final String LIST_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer"; 
 	private static final String COUNT_QRY = "SELECT COUNT(*) as var FROM computer";
 	private static final String PAGINATED_LIST_QRY =  "SELECT id, name, introduced, discontinued, company_id FROM computer LIMIT ? OFFSET ? ";
-	
-	public ComputerDAO(Connection conn) {
-		super(conn);
+
+	private static Connector connector;
+
+	public ComputerDAO(boolean h2) {
+		if(h2) {
+			connector =  new ConnectionH2();
+		} else {
+			connector =  new ConnectionMySQL();
+		}
 	}
 
 	public boolean create(Computer obj) {
-		try (PreparedStatement st = connect.prepareStatement(CREATE_QRY)){
+		try (Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(CREATE_QRY)){
 			st.setNull(1, java.sql.Types.INTEGER);
-			if(obj.getName() == "") {
+			if(obj.getName().isEmpty()) {
 				throw new SQLException("Cannot insert computer with empty name !");
 			} else {
 				st.setString(2, obj.getName());
@@ -51,8 +62,7 @@ public class ComputerDAO extends DAO<Computer> {
 			} else {
 				st.setInt(5, obj.getCompanyId());
 			}
-			int count = st.executeUpdate();
-			System.out.println(count +" computer row(s) created.");
+			st.executeUpdate();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -61,7 +71,8 @@ public class ComputerDAO extends DAO<Computer> {
 	}
 
 	public boolean delete(int id) {
-		try (PreparedStatement st = connect.prepareStatement(DELETE_QRY)){
+		try (Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(DELETE_QRY)){
 			st.setInt(1, id);
 			int count = st.executeUpdate();
 			System.out.println(count +" computer row(s) deleted.");
@@ -74,14 +85,15 @@ public class ComputerDAO extends DAO<Computer> {
 
 	public boolean update(Computer obj) {
 
-		Computer computer = this.find(obj.getId());
-		try (PreparedStatement st = connect.prepareStatement(UPDATE_QRY)){
-			if(obj.getName() == "") {
+		Computer computer = this.findById(obj.getId());
+		try (Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(UPDATE_QRY)){
+			if(obj.getName().isEmpty()) {
 				st.setString(1, computer.getName());
 			} else {
 				st.setString(1, obj.getName());
 			}
-			
+
 			if(obj.getIntroDate() != null) {
 				st.setDate(2, java.sql.Date.valueOf(obj.getIntroDate()));
 			} else if(computer.getIntroDate() != null) {
@@ -99,8 +111,7 @@ public class ComputerDAO extends DAO<Computer> {
 			}
 
 			st.setInt(4, obj.getId());
-			int count = st.executeUpdate();
-			System.out.println(count +" computer row(s) updated.");
+			st.executeUpdate();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -108,9 +119,10 @@ public class ComputerDAO extends DAO<Computer> {
 		return false;
 	}
 
-	public Computer find(int id) {
+	public Computer findById(int id) {
 		Computer computer = new Computer();      
-		try (PreparedStatement st = connect.prepareStatement(FIND_QRY)){
+		try (Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(FIND_BY_ID_QRY)){
 			st.setInt(1, id);
 			ResultSet result = st.executeQuery();
 			if(result.next())
@@ -121,10 +133,24 @@ public class ComputerDAO extends DAO<Computer> {
 		return computer;
 	}
 
-	@Override
+	public Computer findByName(String name) {
+		Computer computer = new Computer();      
+		try (Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(FIND_BY_NAME_QRY)){
+			st.setString(1, name);
+			ResultSet result = st.executeQuery();
+			if(result.next())
+				computer = ComputerMapper.map(result);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return computer;
+	}
+
 	public ArrayList<Computer> list() {
 		ArrayList<Computer> list = new ArrayList<Computer>();
-		try (Statement st = connect.createStatement()){
+		try (Connection connect = connector.getInstance();
+				Statement st = connect.createStatement()){
 			ResultSet result = st.executeQuery(LIST_QRY);
 			while(result.next()) {
 				list.add(ComputerMapper.map(result));
@@ -135,10 +161,11 @@ public class ComputerDAO extends DAO<Computer> {
 
 		return list;
 	}
-	
+
 	public int getNumberRows() {
 		int count = 0;
-		try (Statement st = connect.createStatement()){
+		try (Connection connect = connector.getInstance();
+				Statement st = connect.createStatement()){
 			ResultSet result = st.executeQuery(COUNT_QRY);
 			if(result.next())
 				count = result.getInt("var");
@@ -147,13 +174,14 @@ public class ComputerDAO extends DAO<Computer> {
 		}
 		return count;
 	}
-	
+
 	public ArrayList<Computer> listByPage(int offset, int rows) {
 		ArrayList<Computer> list = new ArrayList<Computer>();
-		try (PreparedStatement st = connect.prepareStatement(PAGINATED_LIST_QRY)){
+		try (Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(PAGINATED_LIST_QRY)){
 			st.setInt(1, rows);
 			st.setInt(2, offset);
-		    ResultSet result = st.executeQuery();
+			ResultSet result = st.executeQuery();
 			while(result.next()) {
 				list.add(ComputerMapper.map(result));
 			}    
@@ -162,9 +190,10 @@ public class ComputerDAO extends DAO<Computer> {
 		}
 		return list;
 	}
-	
-	public void closeConnection() throws SQLException {
-		  this.connect.close();
-	  }
+
+	public void closeConnection() {
+		connector.close();
+	}
+
 
 }

@@ -8,24 +8,52 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import com.excilys.formation.cdb.mapper.CompanyMapper;
+import com.excilys.formation.cdb.mapper.ComputerMapper;
 import com.excilys.formation.cdb.pojos.Company;
+import com.excilys.formation.cdb.pojos.Computer;
+import com.excilys.formation.cdb.services.ConnectionH2;
+import com.excilys.formation.cdb.services.ConnectionMySQL;
+import com.excilys.formation.cdb.services.Connector;
 
-public class CompanyDAO extends DAO<Company> {
-	
+public class CompanyDAO {
+
 	private static final String CREATE_QRY = "insert into company value (?,?)";
 	private static final String DELETE_QRY = "delete from company where id = (?)";
 	private static final String UPDATE_QRY  = "update company set name = ? where id = ?";
-	private static final String FIND_QRY = "SELECT id, name FROM company WHERE id = ?"; 
+	private static final String FIND_BY_ID_QRY = "SELECT id, name FROM company WHERE id = ?"; 
+	private static final String FIND_BY_NAME_QRY = "SELECT id, name FROM company WHERE name = ?"; 
 	private static final String LIST_QRY = "SELECT id, name FROM company"; 
 	private static final String COUNT_QRY = "SELECT COUNT(*) as var FROM company";
 	private static final String PAGINATED_LIST_QRY =  "SELECT id, name FROM computer LIMIT ? OFFSET ? ";
-	
-	public CompanyDAO(Connection conn) {
-		super(conn);
+
+	private static CompanyDAO instance;
+	private static Connector connector;
+
+	public CompanyDAO(boolean h2) {
+		if(h2) {
+			connector =  new ConnectionH2();
+		} else {
+			connector =  new ConnectionMySQL();
+		}
+	}
+
+	public static CompanyDAO getInstanceDB() {
+		if(instance == null) {
+			instance = new CompanyDAO(false);
+		}
+		return instance;
+	}
+
+	public static CompanyDAO getInstanceh2() {
+		if(instance == null) {
+			instance = new CompanyDAO(true);
+		}
+		return instance;
 	}
 
 	public boolean create(Company obj) {
-		try(PreparedStatement st = connect.prepareStatement(CREATE_QRY)){
+		try(Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(CREATE_QRY)){
 			st.setInt(1, obj.getId());
 			st.setString(2, obj.getName());
 			int count = st.executeUpdate();
@@ -38,7 +66,8 @@ public class CompanyDAO extends DAO<Company> {
 	}
 
 	public boolean delete(int id) {
-		try(PreparedStatement st = connect.prepareStatement(DELETE_QRY)){
+		try(Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(DELETE_QRY)){
 			st.setInt(1,id);
 			int count = st.executeUpdate();
 			System.out.println(count +" company row(s) deleted.");
@@ -50,9 +79,10 @@ public class CompanyDAO extends DAO<Company> {
 	}
 
 	public boolean update(Company obj) {
-		Company company = this.find(obj.getId());
-		try(PreparedStatement st = connect.prepareStatement(UPDATE_QRY)){
-			if(obj.getName() == "") {
+		Company company = this.findById(obj.getId());
+		try(Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(UPDATE_QRY)){
+			if(obj.getName().isEmpty()) {
 				st.setString(1, company.getName());
 			} else {
 				st.setString(1, obj.getName());
@@ -68,11 +98,30 @@ public class CompanyDAO extends DAO<Company> {
 		return false;
 	}
 
-	public Company find(int id) {
+	public Company findById(int id) {
 		Company company = new Company();      
-		try(Statement st = connect.createStatement()){
-			ResultSet result = st.executeQuery(FIND_QRY);
-			company = CompanyMapper.map(result);
+		try(Connection connect = connector.getInstance();
+				PreparedStatement st = connect.prepareStatement(FIND_BY_NAME_QRY)){
+			st.setInt(1, id);
+			ResultSet result = st.executeQuery();
+			if(result.next()) {
+				company = CompanyMapper.map(result);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return company;
+	}
+
+	public Company findByName(String name) {
+		Company company = new Company();      
+		try(Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(FIND_BY_NAME_QRY)){
+			st.setString(1, name);
+			ResultSet result = st.executeQuery();
+			if(result.next()) {
+				company = CompanyMapper.map(result);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -81,7 +130,8 @@ public class CompanyDAO extends DAO<Company> {
 
 	public ArrayList<Company> list() {
 		ArrayList<Company> list = new ArrayList<Company>();
-		try(Statement st = connect.createStatement()){
+		try(Connection connect = connector.getInstance(); 
+				Statement st = connect.createStatement()){
 			ResultSet result = st.executeQuery(LIST_QRY);
 			while(result.next()) {
 				list.add(CompanyMapper.map(result));
@@ -92,13 +142,14 @@ public class CompanyDAO extends DAO<Company> {
 
 		return list;
 	}
-	
+
 	public ArrayList<Company> listByPage(int offset, int rows) {
 		ArrayList<Company> list = new ArrayList<Company>();
-		try(PreparedStatement st = connect.prepareStatement(PAGINATED_LIST_QRY)){
+		try(Connection connect = connector.getInstance(); 
+				PreparedStatement st = connect.prepareStatement(PAGINATED_LIST_QRY)){
 			st.setInt(1, rows);
 			st.setInt(2, offset);
-		    ResultSet result = st.executeQuery();
+			ResultSet result = st.executeQuery();
 			while(result.next()) {
 				list.add(CompanyMapper.map(result));
 			}    
@@ -107,10 +158,11 @@ public class CompanyDAO extends DAO<Company> {
 		}
 		return list;
 	}
-	
+
 	public int getNumberRows() {
 		int count = 0;
-		try(Statement st = connect.createStatement()){
+		try(Connection connect = connector.getInstance(); 
+				Statement st = connect.createStatement()){
 			ResultSet result = st.executeQuery(COUNT_QRY);
 			if(result.next())
 				count = result.getInt("var");
@@ -119,8 +171,9 @@ public class CompanyDAO extends DAO<Company> {
 		}
 		return count;
 	}
-	
-	public void closeConnection() throws SQLException {
-		  this.connect.close();
+
+	public void closeConnection() {
+		connector.close();
 	}
+
 }

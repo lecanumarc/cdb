@@ -36,7 +36,14 @@ public abstract class DAO<T> {
   * @param id
   * @return T
   */
-  public abstract T find(int id);
+  public abstract T findById(int id);
+  
+  /**
+   * Méthode de recherche des informations
+   * @param id
+   * @return T
+   */
+   public abstract T findByName(String name);
   
   /**
    * Méthode de recherche des informations
