@@ -14,7 +14,7 @@ import com.excilys.formation.cdb.services.Connector;
 
 public class ComputerDAO  {
 
-	private static final String CREATE_QRY = "insert into computer (id, name, introduced, discontinued, company_id) value (?,?,?,?,?)";
+	private static final String CREATE_QRY = "insert into computer (id, name, introduced, discontinued, company_id) values (?,?,?,?,?)";
 	private static final String DELETE_QRY = "delete from computer where id = (?)";
 	private static final String UPDATE_QRY = "update computer set name = ?, introduced = ?, discontinued = ? where id = ?";
 	private static final String FIND_BY_ID_QRY = "SELECT id, name, introduced, discontinued, company_id FROM computer WHERE id = ?"; 

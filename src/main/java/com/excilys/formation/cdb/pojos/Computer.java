@@ -8,7 +8,7 @@ public class Computer {
 	private int id;
 	private String name; // mandatory
 	private LocalDate introDate; 
-	private LocalDate discDate; // discontinution date
+	private LocalDate discDate; 
 	private int companyId;
 
 	public Computer(int id, String name, LocalDate introDate, LocalDate discDate, int companyId) throws Exception {

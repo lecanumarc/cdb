@@ -48,11 +48,11 @@ public class TestComputerDAO {
 		assertEquals("computer company id is incorrect", 1, computer.getCompanyId());
 	}
 
-//	@Test
-//	public void testCreate() throws Exception {
-//		Computer computer = new Computer(1, "TestName", null, null, 1);
-//		assertTrue("Computer was not created", computerDAO.create(computer));
-//	}
+	@Test
+	public void testCreate() throws Exception {
+		Computer computer = new Computer(1, "TestName", null, null, 1);
+		assertTrue("Computer was not created", computerDAO.create(computer));
+	}
 
 	@Test
 	public void testDelete() throws Exception {
@@ -60,11 +60,11 @@ public class TestComputerDAO {
 		assertTrue("computer was not deleted", deletion);
 	}
 
-//	@Test
-//	public void testUpdate() throws Exception {	
-//		Computer computer = new Computer(17, "TestName", null, null, 1);
-//		assertTrue("Computer was not created", computerDAO.update(computer));
-//	}
+	@Test
+	public void testUpdate() throws Exception {	
+		Computer computer = new Computer(17, "TestName", null, null, 1);
+		assertTrue("Computer was not created", computerDAO.update(computer));
+	}
 
 	@Test
 	public void testCountRows() throws Exception {
