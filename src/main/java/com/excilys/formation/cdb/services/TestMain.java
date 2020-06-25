@@ -20,7 +20,7 @@ public class TestMain {
 //        // using traditional API
 //        logger.debug("Temperature set to {}. Old temperature was {}.", newT, oldT);
 
-        ComputerDAO dao = new ComputerDAO(true);
+        ComputerDAO dao = new ComputerDAO(false);
 		Computer computer = new Computer();
 		computer.setCompanyId(1);
 		computer.setDiscDate(LocalDate.parse("1984-04-01"));
