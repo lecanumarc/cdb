@@ -11,11 +11,11 @@ import com.excilys.formation.cdb.pojos.Computer;
 @WebServlet("/find")
 public class FindComputerServlet extends HttpServlet {
 
-	public void service(HttpServletRequest req, HttpServletResponse res) {
+	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		int id = Integer.parseInt(req.getParameter("id"));
-//		ComputerDAO dao = new ComputerDAO(true);
-//		Computer computer = dao.findById(id);
-//		System.out.println(computer.toString());
+		ComputerDAO dao = new ComputerDAO(false);
+		Computer computer = dao.findById(id);
+		System.out.println(computer);
 		System.out.println("Id : " +id);
 	}
 }

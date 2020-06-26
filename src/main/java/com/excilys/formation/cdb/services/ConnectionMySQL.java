@@ -10,7 +10,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class ConnectionMySQL implements Connector {
 	
 	private static Connection connect;
-	private static final String FILE_PATH =  "src/main/resources/datasource.properties";
+	private static final String FILE_PATH =  "/datasource.properties";
 
 	private static HikariConfig config = new HikariConfig(FILE_PATH);
 	private static HikariDataSource ds = new HikariDataSource(config);

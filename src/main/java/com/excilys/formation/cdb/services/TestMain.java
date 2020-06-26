@@ -27,8 +27,8 @@ public class TestMain {
 		computer.setIntroDate(LocalDate.parse("1983-12-01"));
 		computer.setName("Computer IIIIII");
 		System.out.println(dao.findById(17));
-		boolean comp =  dao.create(computer);
-		System.out.println(comp);
+//		boolean comp =  dao.create(computer);
+//		System.out.println(comp);
 		
 		Computer cpt ;
 //		try {
